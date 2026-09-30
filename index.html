@@ -154,12 +154,12 @@
     </div>
 </div>
 
+<!-- ĐOẠN MÃ ĐIỀU KHIỂN SỔ TAY (KHÔNG ĐƯỢC XÓA) -->
 <script>
     let progressChartInstance = null;
     const todayStr = new Date().toLocaleDateString('vi-VN');
     document.getElementById('currentDateDisplay').innerText = todayStr;
 
-    // Load dữ liệu khi mở web
     window.onload = function() {
         let savedName = localStorage.getItem('ai_passport_name');
         if(savedName) {
@@ -194,15 +194,10 @@
         let history = JSON.parse(localStorage.getItem('ai_passport_history')) || [];
         let todayRecord = history.find(item => item.date === todayStr);
         let checks = document.querySelectorAll('.daily-check');
-        
         if(todayRecord) {
-            // Đã lưu hôm nay -> phục hồi trạng thái
             let score = todayRecord.score;
-            for(let i=0; i<checks.length; i++) {
-                checks[i].checked = (i < score); // Mô phỏng lại số tick
-            }
+            for(let i=0; i<checks.length; i++) { checks[i].checked = (i < score); }
         } else {
-            // Ngày mới -> Xóa trắng checklist
             checks.forEach(chk => chk.checked = false);
         }
     }
@@ -210,14 +205,9 @@
     function saveDaily() {
         let score = document.querySelectorAll('.daily-check:checked').length;
         let history = JSON.parse(localStorage.getItem('ai_passport_history')) || [];
-        
         let existingIndex = history.findIndex(item => item.date === todayStr);
-        if(existingIndex >= 0) {
-            history[existingIndex].score = score; // Cập nhật nếu lưu lại
-        } else {
-            history.push({date: todayStr, score: score}); // Thêm ngày mới
-        }
-        
+        if(existingIndex >= 0) { history[existingIndex].score = score; } 
+        else { history.push({date: todayStr, score: score}); }
         localStorage.setItem('ai_passport_history', JSON.stringify(history));
         
         let msg = document.getElementById('saveMsg');
@@ -227,24 +217,17 @@
 
     function loadDashboard() {
         let history = JSON.parse(localStorage.getItem('ai_passport_history')) || [];
-        
-        // Cập nhật Thẻ thống kê
         document.getElementById('statDays').innerText = history.length;
         let totalScore = history.reduce((sum, item) => sum + item.score, 0);
         let avg = history.length > 0 ? (totalScore / history.length).toFixed(1) : 0;
         document.getElementById('statAvg').innerText = avg + "/4";
 
-        // Chuẩn bị dữ liệu vẽ biểu đồ
-        // Lấy tối đa 7 ngày gần nhất để biểu đồ không bị nát
         let recentHistory = history.slice(-7);
-        let labels = recentHistory.map(item => item.date.substring(0, 5)); // Lấy ngày/tháng
+        let labels = recentHistory.map(item => item.date.substring(0, 5));
         let dataScores = recentHistory.map(item => item.score);
 
-        // Vẽ biểu đồ Chart.js
         const ctx = document.getElementById('progressChart').getContext('2d');
-        
-        if (progressChartInstance) { progressChartInstance.destroy(); } // Xóa biểu đồ cũ nếu có
-        
+        if (progressChartInstance) { progressChartInstance.destroy(); } 
         progressChartInstance = new Chart(ctx, {
             type: 'bar',
             data: {
@@ -258,33 +241,21 @@
             },
             options: {
                 responsive: true,
-                scales: {
-                    y: { beginAtZero: true, max: 4, ticks: { stepSize: 1 } }
-                },
+                scales: { y: { beginAtZero: true, max: 4, ticks: { stepSize: 1 } } },
                 plugins: { legend: { display: false } }
             }
         });
     }
 </script>
+ <!-- NÚT GỌI GIA SƯ AI - CHỐNG LỖI KẾT NỐI -->
+<a href="https://udify.app/chat/XUyCk9Exlo65bUnz" target="_blank" id="ai-button" style="position: fixed; bottom: 30px; right: 30px; background: linear-gradient(135deg, #e67e22, #d35400); color: white; padding: 15px 25px; border-radius: 30px; text-decoration: none; font-weight: bold; font-family: sans-serif; box-shadow: 0 8px 15px rgba(230,126,34,0.4); z-index: 1000; display: flex; align-items: center; justify-content: center;">
+    💬 Mở Gia Sư AI
+</a>
+<style>
+    #ai-button:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 10px 20px rgba(230,126,34,0.6); }
+</style>
 
-<script src="https://sf-cdn.coze.com/obj/unpkg-va/flow-platform/chat-app-sdk/1.2.0-beta.6/libs/oversea/index.js"></script>
-<script>
-  new CozeWebSDK.WebChatClient({
-    config: {
-      bot_id: '7689117216156614661',
-    },
-    componentProps: {
-      title: 'Coze',
-    },
-    auth: {
-      type: 'token',
-      token: 'pat_********',
-      onRefreshToken: function () {
-        return 'pat_********'
-      }
-    }
-  });
-</script>
+
 
 </body>
 </html>
